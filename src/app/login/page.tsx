@@ -2,16 +2,11 @@ import AuthForm from "../../components/auth-form";
 
 export default function Login() {
   return (
-    <div className="row">
-      <div className="col-6">
-        <h1 className="header">Supabase Auth + Storage</h1>
-        <p className="">
-          Experience our Auth and Storage through a simple profile management
-          example. Create a user profile and upload an avatar image. Fast,
-          simple, secure.
-        </p>
+    <div className="min-h-full mx-auto max-w-2xl py-28 sm:py-28 lg:py-32">
+      <div className="text-center">
+        <h1 className="text-3xl">Login</h1>
       </div>
-      <div className="col-6 auth-widget">
+      <div className="">
         <AuthForm />
       </div>
     </div>
