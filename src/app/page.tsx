@@ -7,7 +7,7 @@ export default function Home() {
             <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
               Discover and Save Upcoming Events
             </h1>
-            <p className="font-openSans mt-6 text-lg leading-8 text-gray-600">
+            <p className="font-openSans mt-6 text-md leading-8 text-gray-600">
               Explore a wide range of sports, concerts, and entertainment
               options. Create an account to bookmark your favorite events,
               receive reminders, and stay updated with event details. Find your
