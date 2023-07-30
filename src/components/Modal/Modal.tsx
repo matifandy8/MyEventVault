@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Resolver, useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { Database } from "@/app/database.types";
 
 type FormValues = {
   name: string;
@@ -12,13 +14,14 @@ type FormValues = {
   image: any;
 };
 
-const validationSchema = yup.object({
+const validationSchema: any = yup.object({
   name: yup.string().required("Name is required"),
   description: yup.string().required("Description is required"),
   date: yup.string().required("Date is required"),
 });
 
-export default function Modal() {
+export default function Modal({ userId }: any) {
+  const supabase = createClientComponentClient<Database>();
   const [showModal, setShowModal] = useState(false);
   const {
     register,
@@ -26,8 +29,25 @@ export default function Modal() {
     reset,
     formState: { errors },
   } = useForm<FormValues>({ resolver: yupResolver(validationSchema) });
-  const onSubmitHandler = (values) => {
-    console.table(values);
+  const onSubmitHandler = async (formData: FormValues) => {
+    console.log(formData);
+    try {
+      const { data, error } = await supabase.from("events").insert({
+        name: formData.name,
+        description: formData.description,
+        date: formData.date,
+        image: formData.image,
+        user_id: userId,
+      });
+
+      if (error) {
+        console.error("Error saving data:", error);
+      } else {
+        console.log("Data saved successfully:", data);
+      }
+    } catch (error: any) {
+      console.error("Error saving data:", error.message);
+    }
     reset();
   };
 
@@ -68,6 +88,7 @@ export default function Modal() {
                       className="rounded border border-neutral-200 bg-neutral-50 p-1"
                       type="text"
                       id="name"
+                      placeholder="Name of Event"
                       {...register("name")}
                     />
                     {errors?.name && (
@@ -86,6 +107,7 @@ export default function Modal() {
                       className="rounded border border-neutral-200 bg-neutral-50 p-1"
                       type="text"
                       id="description"
+                      placeholder="Description of Event"
                       {...register("description")}
                     />
                     {errors?.description && (
@@ -119,8 +141,9 @@ export default function Modal() {
                     </label>
                     <input
                       className="rounded border border-neutral-200 bg-neutral-50 p-1"
-                      type="file"
+                      type="text"
                       id="image"
+                      placeholder="https://www.example.png"
                       {...register("image")}
                     />
                     <button className="mt-5 rounded bg-green-500 p-2 text-neutral-50    ">
@@ -128,7 +151,6 @@ export default function Modal() {
                     </button>
                   </form>
                 </div>
-                {/*footer*/}
                 <div className="flex items-center justify-end p-6 border-t border-solid border-slate-200 rounded-b">
                   <button
                     className="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"

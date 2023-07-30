@@ -10,16 +10,8 @@ export default function Dashboard() {
           check upcoming events, and more.
         </p>
         <div className="grid place-items-center mt-8">
-          <Modal />
+          <Modal userId={"matias"} />
         </div>
-      </div>
-      <div className="mt-8">
-        <h2 className="text-2xl font-bold">Upcoming Events</h2>
-        <p className="text-gray-600 mt-3">
-          Here&apos;s a list of the events you have coming up. Keep track of
-          your schedule and don&apos;t miss any exciting moments.
-        </p>
-        {/* Add a component or section to display the list of upcoming events */}
       </div>
       <div className="mt-8">
         <h2 className="text-2xl font-bold">Saved Events</h2>
