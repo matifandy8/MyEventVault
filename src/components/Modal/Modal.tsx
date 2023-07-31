@@ -23,6 +23,7 @@ const validationSchema: any = yup.object({
 export default function Modal({ userId }: any) {
   const supabase = createClientComponentClient<Database>();
   const [showModal, setShowModal] = useState(false);
+  const [isSaveSuccessful, setIsSaveSuccessful] = useState(false);
   const {
     register,
     handleSubmit,
@@ -44,6 +45,7 @@ export default function Modal({ userId }: any) {
         console.error("Error saving data:", error);
       } else {
         console.log("Data saved successfully:", data);
+        setIsSaveSuccessful(true);
       }
     } catch (error: any) {
       console.error("Error saving data:", error.message);
@@ -63,22 +65,14 @@ export default function Modal({ userId }: any) {
       {showModal ? (
         <>
           <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
-            <div className="relative w-auto my-6 mx-auto max-w-3xl">
+            <div className="relative my-6 max-w-7xl">
               <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
                 <div className="flex items-start justify-between p-5 border-b border-solid border-slate-200 rounded-t">
                   <h3 className="text-3xl font-semibold">Save Event</h3>
-                  <button
-                    className="p-1 ml-auto bg-transparent border-0 text-black opacity-5 float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
-                    onClick={() => setShowModal(false)}
-                  >
-                    <span className="bg-transparent text-black opacity-5 h-6 w-6 text-2xl block outline-none focus:outline-none">
-                      ×
-                    </span>
-                  </button>
                 </div>
                 <div className="relative p-6 flex-auto">
                   <form
-                    className="flex flex-col gap-2 rounded-lg p-8 text-neutral-900"
+                    className="flex flex-col gap-2 rounded-lg p-8 text-neutral-900 "
                     onSubmit={handleSubmit(onSubmitHandler)}
                   >
                     <label htmlFor="name" className="text-left">
@@ -150,6 +144,11 @@ export default function Modal({ userId }: any) {
                       Save Event
                     </button>
                   </form>
+                  {isSaveSuccessful && (
+                    <div className="bg-green-500 text-white font-bold py-2 px-4 rounded">
+                      Event was successfully saved!
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center justify-end p-6 border-t border-solid border-slate-200 rounded-b">
                   <button

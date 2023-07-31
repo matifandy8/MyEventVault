@@ -1,6 +1,12 @@
+import ListEvents from "@/components/ListEvents/ListEvents";
 import Modal from "@/components/Modal/Modal";
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
+import { Database } from "../database.types";
 
-export default function Dashboard() {
+export default async function Dashboard() {
+  const supabase = createServerComponentClient<Database>({ cookies });
+  let { data: eventsData } = await supabase.from("events").select("*");
   return (
     <div className="mx-auto max-w-2xl py-28 sm:py-28 lg:py-32">
       <div className="text-center">
@@ -14,12 +20,12 @@ export default function Dashboard() {
         </div>
       </div>
       <div className="mt-8">
-        <h2 className="text-2xl font-bold">Saved Events</h2>
+        <h1 className="text-2xl font-bold">Saved Events</h1>
         <p className="text-gray-600 mt-3">
           Save your favorite events to watch later. Click the &quot;Save
           Event&quot; button on the event details page to add them here.
         </p>
-        {/* Add a component or section to display the list of saved events */}
+        <ListEvents events={eventsData} />
       </div>
     </div>
   );
