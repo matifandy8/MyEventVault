@@ -26,6 +26,14 @@ export interface Database {
           date?: string;
           image?: string | null;
         };
+        Delete: {
+          id: number;
+          user_id: string;
+          name?: string;
+          description?: string;
+          date?: string;
+          image?: string | null;
+        };
         Update: {
           id?: number;
           user_id: string;

@@ -3,14 +3,33 @@
 import Image from "next/image";
 import DEFAULT_IMAGE_URL from "../../../public/images/default-image.jpg";
 import { EventsArray } from "@/types/events";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { Database } from "@/app/database.types";
 
 const ListEvents = ({ events }: { events: EventsArray | null }) => {
+  const supabase = createClientComponentClient<Database>();
+
   const handleEditEvent = (eventId: number) => {
     console.log(`Edit event with ID: ${eventId}`);
+    // open a modal like save event
   };
 
-  const handleDeleteEvent = (eventId: number) => {
+  const handleDeleteEvent = async (eventId: number) => {
     console.log(`Delete event with ID: ${eventId}`);
+    try {
+      const { data, error } = await supabase
+        .from("events")
+        .delete()
+        .eq("id", eventId);
+      if (error) {
+        console.error("Error deleting event:", error.message);
+      }
+      if (data) {
+        console.log("Event deleted successfully:", data);
+      }
+    } catch (error) {
+      console.error("Error deleting event:", error.message);
+    }
   };
   return (
     <div className="py-8">

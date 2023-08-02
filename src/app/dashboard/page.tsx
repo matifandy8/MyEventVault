@@ -6,7 +6,14 @@ import { Database } from "../database.types";
 
 export default async function Dashboard() {
   const supabase = createServerComponentClient<Database>({ cookies });
-  let { data: eventsData } = await supabase.from("events").select("*");
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  let { data: eventsData } = await supabase
+    .from("events")
+    .select("*")
+    .eq("user_id", session?.user.id);
+
   return (
     <div className="mx-auto max-w-2xl py-28 sm:py-28 lg:py-32">
       <div className="text-center">
@@ -16,7 +23,7 @@ export default async function Dashboard() {
           check upcoming events, and more.
         </p>
         <div className="grid place-items-center mt-8">
-          <Modal userId={"matias"} />
+          <Modal userId={session?.user.id} />
         </div>
       </div>
       <div className="mt-8">
