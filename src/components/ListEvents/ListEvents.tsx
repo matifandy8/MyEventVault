@@ -6,9 +6,48 @@ import { EventsArray } from "@/types/events";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Database } from "@/app/database.types";
 import ModalUpdate from "../ModalUpdate/ModalUpdate";
+import { useState } from "react";
 
 const ListEvents = ({ events }: { events: EventsArray | null }) => {
   const supabase = createClientComponentClient<Database>();
+  const [listEvents, setListEvents] = useState(events || []);
+
+  const subscription = supabase
+    .channel("custom-all-channel")
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "events" },
+      (payload) => {
+        console.log("Update received!", payload);
+        const updatedEvent: any = payload.new;
+
+        // Update the listEvents state with the updated event
+        setListEvents((prevEvents) => {
+          const updatedEvents = prevEvents.map((event) => {
+            if (event.id === updatedEvent.id) {
+              return { ...event, ...updatedEvent };
+            } else {
+              return event;
+            }
+          });
+          const isNewEvent = !updatedEvents.some(
+            (event) => event.id === updatedEvent.id
+          );
+          if (isNewEvent) {
+            updatedEvents.push(updatedEvent);
+          }
+          if (payload.eventType === "DELETE") {
+            return updatedEvents.filter(
+              (event) => event.id !== updatedEvent.id
+            );
+          }
+          return updatedEvents;
+        });
+      }
+    )
+    .subscribe();
+
+  console.log(listEvents);
 
   const handleDeleteEvent = async (eventId: number) => {
     console.log(`Delete event with ID: ${eventId}`);
@@ -23,19 +62,19 @@ const ListEvents = ({ events }: { events: EventsArray | null }) => {
       if (data) {
         console.log("Event deleted successfully:", data);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error deleting event:", error.message);
     }
   };
   return (
     <div className="py-8">
-      {events?.length === 0 ? (
+      {listEvents?.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16">
           <p className="text-lg text-gray-500">No events saved yet.</p>
         </div>
       ) : (
         <ul className="space-y-4">
-          {events?.map((event) => (
+          {listEvents?.map((event) => (
             <li
               key={event.id}
               className="max-w-sm bg-white shadow rounded-lg p-4"
