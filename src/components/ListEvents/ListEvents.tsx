@@ -5,14 +5,10 @@ import DEFAULT_IMAGE_URL from "../../../public/images/default-image.jpg";
 import { EventsArray } from "@/types/events";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Database } from "@/app/database.types";
+import ModalUpdate from "../ModalUpdate/ModalUpdate";
 
 const ListEvents = ({ events }: { events: EventsArray | null }) => {
   const supabase = createClientComponentClient<Database>();
-
-  const handleEditEvent = (eventId: number) => {
-    console.log(`Edit event with ID: ${eventId}`);
-    // open a modal like save event
-  };
 
   const handleDeleteEvent = async (eventId: number) => {
     console.log(`Delete event with ID: ${eventId}`);
@@ -69,12 +65,13 @@ const ListEvents = ({ events }: { events: EventsArray | null }) => {
               <p className="text-gray-600 mt-2">{event.description}</p>
               <p className="text-gray-500 text-sm mt-2">{event.date}</p>
               <div className="flex justify-start mt-4">
-                <button
-                  className="text-blue-600 hover:text-blue-700 mr-4"
-                  onClick={() => handleEditEvent(event.id)}
-                >
-                  Edit
-                </button>
+                <ModalUpdate
+                  id={event.id}
+                  name={event.name}
+                  description={event.description}
+                  date={event.date}
+                  image={event.image}
+                />
                 <button
                   className="text-red-600 hover:text-red-700"
                   onClick={() => handleDeleteEvent(event.id)}

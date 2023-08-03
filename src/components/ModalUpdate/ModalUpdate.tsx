@@ -20,7 +20,13 @@ const validationSchema: any = yup.object({
   date: yup.string().required("Date is required"),
 });
 
-export default function Modal({ userId }: any) {
+export default function ModalUpdate({
+  id,
+  name,
+  description,
+  date,
+  image,
+}: any) {
   const supabase = createClientComponentClient<Database>();
   const [showModal, setShowModal] = useState(false);
   const [isUpdateSuccessful, setIsUpdateSuccessful] = useState(false);
@@ -33,13 +39,15 @@ export default function Modal({ userId }: any) {
   const onSubmitHandler = async (formData: FormValues) => {
     console.log(formData);
     try {
-      const { data, error } = await supabase.from("events").insert({
-        name: formData.name,
-        description: formData.description,
-        date: formData.date,
-        image: formData.image,
-        user_id: userId,
-      });
+      const { data, error } = await supabase
+        .from("events")
+        .update({
+          name: formData.name,
+          description: formData.description,
+          date: formData.date,
+          image: formData.image,
+        })
+        .match({ id: id });
 
       if (error) {
         console.error("Error Updating data:", error);
@@ -50,13 +58,12 @@ export default function Modal({ userId }: any) {
     } catch (error: any) {
       console.error("Error saving data:", error.message);
     }
-    reset();
   };
 
   return (
     <>
       <button
-        className="rounded-md bg-cyan-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-cyan-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-700"
+        className="rounded-md bg-cyan-500 mr-4 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-cyan-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-700"
         type="button"
         onClick={() => setShowModal(true)}
       >
@@ -83,6 +90,7 @@ export default function Modal({ userId }: any) {
                       type="text"
                       id="name"
                       placeholder="Name of Event"
+                      defaultValue={name}
                       {...register("name")}
                     />
                     {errors?.name && (
@@ -102,6 +110,7 @@ export default function Modal({ userId }: any) {
                       type="text"
                       id="description"
                       placeholder="Description of Event"
+                      defaultValue={description}
                       {...register("description")}
                     />
                     {errors?.description && (
@@ -120,6 +129,7 @@ export default function Modal({ userId }: any) {
                       type="date"
                       id="date"
                       placeholder="dd / mm / yy"
+                      defaultValue={date}
                       {...register("date")}
                     />
                     {errors?.date && (
@@ -138,6 +148,7 @@ export default function Modal({ userId }: any) {
                       type="text"
                       id="image"
                       placeholder="https://www.example.png"
+                      defaultValue={image}
                       {...register("image")}
                     />
                     <button className="mt-5 rounded bg-green-500 p-2 text-neutral-50    ">
