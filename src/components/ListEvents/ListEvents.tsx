@@ -18,39 +18,30 @@ const ListEvents = ({ events }: { events: EventsArray | null }) => {
       "postgres_changes",
       { event: "*", schema: "public", table: "events" },
       (payload) => {
-        console.log("Update received!", payload);
-        const updatedEvent: any = payload.new;
-
-        // Update the listEvents state with the updated event
-        setListEvents((prevEvents) => {
-          const updatedEvents = prevEvents.map((event) => {
-            if (event.id === updatedEvent.id) {
-              return { ...event, ...updatedEvent };
-            } else {
-              return event;
-            }
-          });
-          const isNewEvent = !updatedEvents.some(
-            (event) => event.id === updatedEvent.id
+        if (payload.eventType === "DELETE") {
+          setListEvents((prevEvents) =>
+            prevEvents.filter((event) => event.id !== payload.old.id)
           );
-          if (isNewEvent) {
-            updatedEvents.push(updatedEvent);
-          }
-          if (payload.eventType === "DELETE") {
-            return updatedEvents.filter(
-              (event) => event.id !== updatedEvent.id
+        } else {
+          setListEvents((prevEvents) => {
+            const updatedEvents = prevEvents.map((event) =>
+              event.id === payload.new.id ? { ...event, ...payload.new } : event
             );
-          }
-          return updatedEvents;
-        });
+
+            if (!prevEvents.some((event) => event.id === payload.new.id)) {
+              console.log(payload.new);
+              updatedEvents.push(payload.new);
+            }
+
+            return updatedEvents;
+          });
+        }
       }
     )
     .subscribe();
 
   console.log(listEvents);
-
-  const handleDeleteEvent = async (eventId: number) => {
-    console.log(`Delete event with ID: ${eventId}`);
+  const handleDeleteEvent = async (eventId: number | undefined) => {
     try {
       const { data, error } = await supabase
         .from("events")
@@ -66,6 +57,41 @@ const ListEvents = ({ events }: { events: EventsArray | null }) => {
       console.error("Error deleting event:", error.message);
     }
   };
+  function formattedDate(dateString: any) {
+    const date = new Date(dateString);
+
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+
+    const daysOfWeek = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+
+    const year = date.getUTCFullYear();
+    const month = months[date.getUTCMonth()];
+    const day = date.getUTCDate();
+    const dayOfWeek = daysOfWeek[date.getUTCDay()];
+
+    return `${dayOfWeek}, ${month} ${day}, ${year}`;
+  }
   return (
     <div className="py-8">
       {listEvents?.length === 0 ? (
@@ -75,13 +101,9 @@ const ListEvents = ({ events }: { events: EventsArray | null }) => {
       ) : (
         <ul className="space-y-4">
           {listEvents?.map((event) => (
-            <li
-              key={event.id}
-              className="max-w-sm bg-white shadow rounded-lg p-4"
-            >
-              <h3 className="text-lg font-semibold mb-1">{event.name}</h3>
+            <li key={event.id} className="max-w-xs bg-white shadow rounded-lg">
               {event.image ? (
-                <div className="h-40 w-64 relative py-4">
+                <div className="w-full h-64 bg-top bg-cover rounded-t relative">
                   <Image
                     src={event.image}
                     alt="Picture of the event"
@@ -91,7 +113,7 @@ const ListEvents = ({ events }: { events: EventsArray | null }) => {
                   />
                 </div>
               ) : (
-                <div className="h-40 w-64 relative py-4">
+                <div className="w-full h-64 bg-top bg-cover rounded-t relative">
                   <Image
                     src={DEFAULT_IMAGE_URL}
                     alt="Default Picture"
@@ -101,9 +123,14 @@ const ListEvents = ({ events }: { events: EventsArray | null }) => {
                   />
                 </div>
               )}
-              <p className="text-gray-600 mt-2">{event.description}</p>
-              <p className="text-gray-500 text-sm mt-2">{event.date}</p>
-              <div className="flex justify-start mt-4">
+              <h3 className="text-lg font-semibold mb-1 pl-3.5 pt-3.5">
+                {event.name}
+              </h3>
+              <p className="text-gray-600 mt-2 pl-3.5">{event.description}</p>
+              <p className="text-gray-500 text-sm mt-2 pl-3.5">
+                {formattedDate(event.date)}
+              </p>
+              <div className="flex justify-start mt-4 pl-3.5 pb-3.5">
                 <ModalUpdate
                   id={event.id}
                   name={event.name}
