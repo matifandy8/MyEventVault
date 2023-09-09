@@ -93,15 +93,18 @@ const ListEvents = ({ events }: { events: EventsArray | null }) => {
     return `${dayOfWeek}, ${month} ${day}, ${year}`;
   }
   return (
-    <div className="py-8">
+    <div className="py-8 grid mx-auto">
       {listEvents?.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16">
           <p className="text-lg text-gray-500">No events saved yet.</p>
         </div>
       ) : (
-        <ul className="space-y-4">
+        <ul className="grid grid-cols-1 grid-rows-1 md:grid-cols-2 content-center">
           {listEvents?.map((event) => (
-            <li key={event.id} className="max-w-xs bg-white shadow rounded-lg">
+            <li
+              key={event.id}
+              className="max-w-xs bg-white shadow rounded-lg ml-5.5 mb-3.5"
+            >
               {event.image ? (
                 <div className="w-full h-64 bg-top bg-cover rounded-t relative">
                   <Image
