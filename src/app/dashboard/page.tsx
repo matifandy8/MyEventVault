@@ -6,7 +6,7 @@ import { Database } from "../database.types";
 import ComingEventsList from "@/components/ComingEventList/ComingEventList";
 
 const apiKey = process.env.SECRET_PASS;
-const URL = "http://localhost:8081/events";
+const URL = "https://api-events-yj5s.onrender.com/events";
 // https://eminent-fast-silverfish.glitch.me/events
 
 async function getComingEvents() {
